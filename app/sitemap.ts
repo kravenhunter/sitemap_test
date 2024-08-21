@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { ICategory, IResponse } from "./product/sitemap";
 const BASE_URL = "https://server.realityinvest.ru/api";
-const APP_URL = "http://localhost:3000";
+const APP_URL = "http://sitemap.iwr.agency";
 const metaData: MetadataRoute.Sitemap = [
   {
     //Главный роуте "https://iwr.agency"

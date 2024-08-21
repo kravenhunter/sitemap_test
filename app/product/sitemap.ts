@@ -46,7 +46,7 @@ export interface IResponse<T> {
 }
 
 const BASE_URL = "https://server.realityinvest.ru/api";
-const APP_URL = "http://localhost:3000";
+const APP_URL = "http://sitemap.iwr.agency";
 export const getJobCardsByCategory = async (category: string, page = 1, count?: number) => {
   try {
     //const jobCards: IResponse<IProps> = await ApiServices.get("/job?size=30&page=1");
