@@ -45,8 +45,9 @@ export interface IResponse<T> {
   jobs?: T;
 }
 
+const isLocalServer = process.env.LOCAL_SERVER;
 const BASE_URL = "https://server.realityinvest.ru/api";
-const APP_URL = "http://sitemap.iwr.agency";
+const APP_URL = isLocalServer ?? "http://sitemap.iwr.agency";
 export const getJobCardsByCategory = async (category: string, page = 1, count?: number) => {
   try {
     //const jobCards: IResponse<IProps> = await ApiServices.get("/job?size=30&page=1");
@@ -82,21 +83,22 @@ export const getCategoryList = async () => {
 
 export async function generateSitemaps() {
   const propsCategories = await getCategoryList();
-  return propsCategories.categories?.map((el) => ({ id: `${el.uniqueName}_${el.id}` }));
+  // return propsCategories.categories?.map((el) => ({ id: `${el.uniqueName}_${el.id}` }));
+  return propsCategories.categories?.map((el) => ({ id: el.uniqueName }));
 }
 const metaData: MetadataRoute.Sitemap = [];
 
 export default async function sitemap({ id }: { id: string }): Promise<MetadataRoute.Sitemap> {
   // Google's limit is 50,000 URLs per sitemap
-  const [category, categoryId] = id.split("_");
+  // const [category, categoryId] = id.split("_");
 
-  const props = await getJobCardsByCategory(category, 1, 300);
+  const props = await getJobCardsByCategory(id, 1, 300);
 
   let jobCards = props.jobCards ?? [];
 
   if (props.jobCards) {
     for (let index = 2; index <= props.totalPages; index++) {
-      const getNewList = await getJobCardsByCategory(category, index, 300);
+      const getNewList = await getJobCardsByCategory(id, index, 300);
       getNewList.jobCards && (jobCards = [...jobCards, ...getNewList.jobCards]);
     }
 

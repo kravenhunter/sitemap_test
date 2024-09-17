@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 import { ICategory, IResponse } from "./product/sitemap";
+const devState = process.env.NODE_ENV;
+const isLocalServer = process.env.LOCAL_SERVER;
 const BASE_URL = "https://server.realityinvest.ru/api";
-const APP_URL = "http://sitemap.iwr.agency";
+const APP_URL = isLocalServer ?? "http://sitemap.iwr.agency";
+
 const metaData: MetadataRoute.Sitemap = [
   {
     //Главный роуте "https://iwr.agency"
@@ -46,16 +49,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const propsCategories = await getCategoryList();
   if (propsCategories.categories) {
     const categorySort = propsCategories.categories.filter((el) => el.uniqueName !== "all");
-    const categoriesMeta: MetadataRoute.Sitemap = categorySort.map((el) => ({
-      //http://localhost:3000/analytics/sitemap.xml/analytics_12
-      url: `${APP_URL}/product/sitemap/${el.uniqueName}_${el.id}`,
-      // url: `${APP_URL}/product/sitemap.xml/${el.uniqueName}_${el.id}`,
-      //url: `${APP_URL}/product/sitemap.xml/${el.uniqueName}`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.5,
-    }));
-    metaData.push(...categoriesMeta);
+
+    if (devState === "development") {
+      const categoriesMeta: MetadataRoute.Sitemap = categorySort.map((el) => ({
+        //http://localhost:3000/analytics/sitemap.xml/analytics_12
+        url: `${APP_URL}/product/sitemap.xml/${el.uniqueName}`,
+        // url: `${APP_URL}/product/sitemap.xml/${el.uniqueName}_${el.id}`,
+        lastModified: new Date(),
+        changeFrequency: "yearly",
+        priority: 0.5,
+      }));
+      metaData.push(...categoriesMeta);
+    } else if (devState === "production") {
+      const categoriesMeta: MetadataRoute.Sitemap = categorySort.map((el) => ({
+        //http://localhost:3000/analytics/sitemap.xml/analytics_12
+        url: `${APP_URL}/product/sitemap/${el.uniqueName}.xml`,
+        // url: `${APP_URL}/product/sitemap.xml/${el.uniqueName}_${el.id}`,
+        lastModified: new Date(),
+        changeFrequency: "yearly",
+        priority: 0.5,
+      }));
+      metaData.push(...categoriesMeta);
+    }
   }
   return metaData;
 }
